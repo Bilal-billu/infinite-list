@@ -67,49 +67,59 @@ var list = [
     ]
   }
 ]
+const styleDecimal = "list-decimal";
+const styleDisc = "list-disc";
+function toggleSubmenu(e) {
+  e.stopPropagation();
+  let subMenu = e.target.querySelector('ul');
+  if (!subMenu) {
+    return
+  }
+  if (subMenu.style.display === "none" || !subMenu.style.display) {
+    subMenu.style.display = "block"
+  }
+  else {
+    subMenu.style.display = "none"
+  }
+}
 
+function RenderSubList(item, style) {
+  var finalStyle = style === styleDisc ? styleDecimal : styleDisc
+
+  return (
+    <ul className={`ps-10 ${finalStyle} hidden`}>
+      {item.map((subItem, index) => {
+        return (
+          <li key={subItem.name + index} onClick={toggleSubmenu} 
+          className={`${subItem.subList&&subItem.subList.length>0?'cursor-pointer':'cursor-default'}`}>
+            {subItem.name}
+            {subItem.subList && subItem.subList.length > 0 &&
+              RenderSubList(subItem.subList, finalStyle)
+            }
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
 
 function App() {
-  const styleDecimal = "list-decimal";
-  const styleDisc = "list-disc";
-  
-  function renderSubList(item, style) {
-    const finalStyle = style === styleDisc ? styleDecimal : styleDisc
-
-    return (
-      <ul className={`ps-10 ${finalStyle}  list-disc`}>
-        {item.map((subItem, index) => {
-          return (
-            <li key={subItem.name + index} >
-              {subItem.name}
-              {subItem.subList && subItem.subList.length > 0 &&
-                renderSubList(subItem.subList, finalStyle)
-              }
-            </li>
-          )
-        })}
-      </ul>
-    )
-  }
-
   return (
     <div className="font-semibold text-2xl p-4">
       <ul className="list-decimal ps-10">
         {list.map((item, index) => {
           return (
-            <li key={item.name + index}>
+            <li key={item.name + index} onClick={toggleSubmenu} className={`${item.subList.length>0&&'cursor-pointer'}`}>
               {item.name}
               {item.subList && item.subList.length > 0 &&
-                renderSubList(item.subList, styleDecimal)
+                RenderSubList(item.subList, styleDecimal)
               }
             </li>
           )
         })}
       </ul>
-
-
     </div>
   )
 }
 
-export default App
+export default App;
